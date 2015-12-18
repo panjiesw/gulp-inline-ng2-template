@@ -17,7 +17,8 @@ var defaults = {
   css: true,
   // html_ext: 'html',
   target: 'es6',
-  indent: 2
+  indent: 2,
+  minified: false
 };
 
 var HTMLOptions = {
@@ -139,8 +140,10 @@ module.exports = function parser(file, options) {
     assetFiles = indent(assetFiles);
 
     // Build the final string.
-    if ('html' === opts.type || 'jade' === opts.type)  assetFiles = opts.prop + ': `\n' + assetFiles + '\n' + indentation + '`';
-    if ('css' === opts.type)   assetFiles = opts.prop + ': [`\n' + assetFiles + '\n' + indentation + '`]';
+    if (('html' === opts.type && !opts.minified) || 'jade' === opts.type)  assetFiles = opts.prop + ': `\n' + assetFiles + '\n' + indentation + '`';
+    if ('html' === opts.type && opts.minified)  assetFiles = opts.prop + ': `' + assetFiles + '`';
+    if ('css' === opts.type && !opts.minified)   assetFiles = opts.prop + ': [`\n' + assetFiles + '\n' + indentation + '`]';
+    if ('css' === opts.type && opts.minified)   assetFiles = opts.prop + ': [`' + assetFiles + '`]';
     if ('es5' === opts.target) assetFiles = compile(assetFiles).code;
 
     // One liner.
@@ -164,7 +167,7 @@ module.exports = function parser(file, options) {
       for (var i = 0; i < indentation.length + opts.indent; i++) { spaces += ' '; }
       str.split('\n').forEach(function (line) {
         // Add indentation spaces only to non-empty lines.
-        lines.push((/^(\s*)$/.test(line) ? '' : spaces) + line);
+        if (!opts.minified) lines.push((/^(\s*)$/.test(line) ? '' : spaces) + line);
       });
       return lines.join('\n');
     }
