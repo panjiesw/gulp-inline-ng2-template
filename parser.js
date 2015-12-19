@@ -168,6 +168,7 @@ module.exports = function parser(file, options) {
       str.split('\n').forEach(function (line) {
         // Add indentation spaces only to non-empty lines.
         if (!opts.minified) lines.push((/^(\s*)$/.test(line) ? '' : spaces) + line);
+        else lines.push(line);
       });
       return lines.join('\n');
     }
